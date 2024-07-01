@@ -6,13 +6,9 @@ p, h1, h2, h3, h4, h5, h6 {
   color: white;
 }
 
-body {
-  font-size: 16px;
-}
-
 button {
-  width: 200px;
-  height: 75px;
+  width: 250px;
+  height: 100px;
   background: linear-gradient(to bottom, #3449eb, #e534eb);
   text-align: center;
   border-radius: 12px;
