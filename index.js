@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("foo").addEventListener("click", () => {
-        alert(Date.now().toString());
+        alert("ソースコードに移動しますん");
+        location.href = "https://github.com/Takenoko-II/Takenoko-II.github.com";
     });
 });
