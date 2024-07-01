@@ -11,6 +11,8 @@ body {
 }
 
 button {
+  width: 200px;
+  height: 75px;
   background-color: linear-gradient(to buttom, #3449eb, #e534eb);
   text-align: center;
   border-radius: 12px;
