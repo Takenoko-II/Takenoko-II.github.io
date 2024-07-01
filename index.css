@@ -6,3 +6,13 @@ p, h1, h2, h3, h4, h5, h6 {
   color: white
 }
 
+body {
+  font-size: 16px
+}
+
+button {
+  background-color: linear-gradient(to buttom, #3449eb, #e534eb)
+  text-align: center
+  border-radius: 12px
+  border: none
+}
