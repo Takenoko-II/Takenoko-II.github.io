@@ -31,14 +31,33 @@ class BlockStateSearchResultTable {
         cell.append(name, c, type);
 
         name.addEventListener("click", () => {
-            type.textContent = property.values.map(({ value }) => value).toString();
+            const values: (string | number | boolean)[] = property.values.map(({ value }) => value);
 
-            if (property.type === "int" || property.type === "bool") {
-                type.style.color = "#b9ff98";
+            const component: TextComponent = TextComponent.empty();
+
+            const separator = TextComponent.new(", ").setTextColor("white");
+
+            for (let i = 0; i < values.length; i++) {
+                const value = TextComponent.new(values[i].toString());
+
+                switch (property.type) {
+                    case "int":
+                    case "bool":
+                        value.setTextColor("#b9ff98");
+                        break;
+                    case "string":
+                        value.setTextColor("#e49764");
+                        break;
+                }
+
+                component.append(value);
+
+                if (i < values.length - 1) {
+                    component.append(separator);
+                }
             }
-            else {
-                type.style.color = "#e49764";
-            }
+
+            type.replaceWith(component.build());
         });
     }
 

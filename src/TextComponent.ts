@@ -65,4 +65,8 @@ export class TextComponent {
     public static new(text: string): TextComponent {
         return new this(text);
     }
+
+    public static empty(): TextComponent {
+        return new this("");
+    }
 }

@@ -1,3 +1,4 @@
+import { TextComponent } from "./TextComponent.js";
 class BlockStateSearchResultTable {
     constructor() {
         this.table = document.createElement("table");
@@ -20,13 +21,26 @@ class BlockStateSearchResultTable {
         type.textContent = property.type;
         cell.append(name, c, type);
         name.addEventListener("click", () => {
-            type.textContent = property.values.map(({ value }) => value).toString();
-            if (property.type === "int" || property.type === "bool") {
-                type.style.color = "#b9ff98";
+            const values = property.values.map(({ value }) => value);
+            const component = TextComponent.empty();
+            const separator = TextComponent.new(", ").setTextColor("white");
+            for (let i = 0; i < values.length; i++) {
+                const value = TextComponent.new(values[i].toString());
+                switch (property.type) {
+                    case "int":
+                    case "bool":
+                        value.setTextColor("#b9ff98");
+                        break;
+                    case "string":
+                        value.setTextColor("#e49764");
+                        break;
+                }
+                component.append(value);
+                if (i < values.length - 1) {
+                    component.append(separator);
+                }
             }
-            else {
-                type.style.color = "#e49764";
-            }
+            type.replaceWith(component.build());
         });
     }
     addBlock(id, properties) {
@@ -105,4 +119,3 @@ document.addEventListener("DOMContentLoaded", () => {
     foo.addEventListener("click", search);
     search();
 });
-export {};

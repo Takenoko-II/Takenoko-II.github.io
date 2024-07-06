@@ -48,4 +48,7 @@ export class TextComponent {
     static new(text) {
         return new this(text);
     }
+    static empty() {
+        return new this("");
+    }
 }
