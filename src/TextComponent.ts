@@ -15,13 +15,13 @@ export class TextComponent {
         this.contentValue = content;
     }
 
-    public setTextColor(color: string) {
+    public setTextColor(color: string): TextComponent {
         this.contentColor = color;
         this.elements.forEach(element => element.contentColor = color);
         return this;
     }
 
-    public setUnderline(color: string) {
+    public setUnderline(color: string): TextComponent {
         this.isUnderlined = true;
         this.underlineColor = color;
         this.elements.forEach(element => {
@@ -67,6 +67,6 @@ export class TextComponent {
     }
 
     public static empty(): TextComponent {
-        return new this("");
+        return this.new("");
     }
 }
