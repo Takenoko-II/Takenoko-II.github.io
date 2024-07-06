@@ -90,7 +90,7 @@ function search(): void {
 
     const input = document.getElementById("input");
     if (input instanceof HTMLInputElement) {
-        const tags = input.value.split(/\s+/g);
+        const tags = input.value.split(/\s+/g).filter(_ => _ !== "");
 
         const table: BlockStateSearchResultTable = new BlockStateSearchResultTable();
 
@@ -102,22 +102,12 @@ function search(): void {
             for (const dataItem of data.data_items) {
                 if (dataItem.properties.length === 0) continue;
 
-                if (tags.some(tag => dataItem.name.includes(tag))) {
+                if (tags.every(tag => dataItem.name.includes(tag) || dataItem.properties.some(_ => _.name.includes(tag)))) {
                     const block: BlockProperty[] = dataItem.properties.map(({ name }) => {
                         return data.block_properties.find(property => property.name === name);
                     });
 
                     map.set(dataItem.name, block);
-                }
-            }
-
-            for (const blockProperty of data.block_properties) {
-                if (tags.some(tag => blockProperty.name.includes(tag) || blockProperty.type === tag)) {
-                    for (const dataItem of data.data_items) {
-                        if (dataItem.properties.some(property => property.name !== blockProperty.name)) continue;
-
-                        map.set(dataItem.name, [blockProperty]);
-                    }
                 }
             }
 
@@ -142,7 +132,7 @@ function search(): void {
                 else {
                     foo.after(table.get());
                 }
-            }, 300);
+            }, 10);
         });
     }
 }

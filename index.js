@@ -102,20 +102,20 @@ function search() {
         return;
     var input = document.getElementById("input");
     if (input instanceof HTMLInputElement) {
-        var tags_1 = input.value.split(/\s+/g);
+        var tags_1 = input.value.split(/\s+/g).filter(function (_) { return _ !== ""; });
         var table_1 = new BlockStateSearchResultTable();
         fetch("mojang-blocks.json").then(function (response) { return __awaiter(_this, void 0, void 0, function () {
-            var data, map, _loop_2, _i, _a, dataItem, _loop_3, _b, _c, blockProperty, oldTable;
-            return __generator(this, function (_d) {
-                switch (_d.label) {
+            var data, map, _loop_2, _i, _a, dataItem, oldTable;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
                     case 0: return [4 /*yield*/, response.json()];
                     case 1:
-                        data = _d.sent();
+                        data = _b.sent();
                         map = new Map();
                         _loop_2 = function (dataItem) {
                             if (dataItem.properties.length === 0)
                                 return "continue";
-                            if (tags_1.some(function (tag) { return dataItem.name.includes(tag); })) {
+                            if (tags_1.every(function (tag) { return dataItem.name.includes(tag) || dataItem.properties.some(function (_) { return _.name.includes(tag); }); })) {
                                 var block = dataItem.properties.map(function (_a) {
                                     var name = _a.name;
                                     return data.block_properties.find(function (property) { return property.name === name; });
@@ -126,20 +126,6 @@ function search() {
                         for (_i = 0, _a = data.data_items; _i < _a.length; _i++) {
                             dataItem = _a[_i];
                             _loop_2(dataItem);
-                        }
-                        _loop_3 = function (blockProperty) {
-                            if (tags_1.some(function (tag) { return blockProperty.name.includes(tag) || blockProperty.type === tag; })) {
-                                for (var _e = 0, _f = data.data_items; _e < _f.length; _e++) {
-                                    var dataItem = _f[_e];
-                                    if (dataItem.properties.some(function (property) { return property.name !== blockProperty.name; }))
-                                        continue;
-                                    map.set(dataItem.name, [blockProperty]);
-                                }
-                            }
-                        };
-                        for (_b = 0, _c = data.block_properties; _b < _c.length; _b++) {
-                            blockProperty = _c[_b];
-                            _loop_3(blockProperty);
                         }
                         map.forEach(function (blockProperties, id) {
                             table_1.addBlock(id, blockProperties);
@@ -158,7 +144,7 @@ function search() {
                             else {
                                 foo.after(table_1.get());
                             }
-                        }, 300);
+                        }, 10);
                         return [2 /*return*/];
                 }
             });
