@@ -1,5 +1,6 @@
 {
     "include": ["src/"],
+    "exclude": [],
     "compilerOptions": {
       "allowJs": true,
       "checkJs": true,
