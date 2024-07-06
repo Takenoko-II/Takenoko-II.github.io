@@ -17,12 +17,22 @@ p, h1, h2, h3, h4, h5, h6 {
     border: none;
     color: white;
     font-size: 32px;
-    box-shadow: 0 8px 0 #711974
+    box-shadow: 0 8px 0 #711974;
 }
 
 .search:hover {
     background: linear-gradient(to bottom, #6271e7, #de60e2);
-    box-shadow: 0 8px 0 #713474
+    box-shadow: 0 8px 0 #713474;
+}
+
+.pushed {
+    position: relative;
+    top: 8px;
+    box-shadow: 0 2px 0 #711974;
+}
+
+.pushed:hover {
+    box-shadow: 0 2px 0 #713474;
 }
 
 input[type="text"] {

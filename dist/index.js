@@ -111,6 +111,10 @@ function search() {
             }, 10);
         });
     }
+    foo.classList.add("pushed");
+    setTimeout(() => {
+        foo.classList.remove("pushed");
+    }, 500);
 }
 document.addEventListener("DOMContentLoaded", () => {
     const foo = document.getElementById("foo");

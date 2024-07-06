@@ -49,6 +49,6 @@ export class TextComponent {
         return new this(text);
     }
     static empty() {
-        return new this("");
+        return this.new("");
     }
 }
