@@ -1,16 +1,53 @@
-body {
-  background-color: #333333;
+body, button {
+    font-family: 'Courier New', Courier, monospace;
+    background-color: #333333;
 }
 
 p, h1, h2, h3, h4, h5, h6 {
-  color: white;
+    color: white;
+    width: 150%;
 }
 
-button {
-  width: 250px;
-  height: 100px;
-  background: linear-gradient(to bottom, #3449eb, #e534eb);
-  text-align: center;
-  border-radius: 12px;
-  border: none;
+.search {
+    width: 250px;
+    height: 100px;
+    background: linear-gradient(to bottom, #3449eb, #e534eb);
+    text-align: center;
+    border-radius: 12px;
+    border: none;
+    color: white;
+    font-size: large;
+}
+
+input[type="text"] {
+    font-family: "Press Start 2P", system-ui;
+    font-weight: 400;
+    font-style: normal;
+    background-color: black;
+    color: white;
+    border-radius: 5px;
+    font-size: 24px;
+    border-width: 4px;
+    border-color:aquamarine;
+}
+
+img {
+    width: 100%;
+}
+
+table, table th, table td {
+    color: white;
+    padding: 8px;
+    border: 2px solid white;
+}
+
+.propertyId {
+    color: #fff6a3;
+    background: #333333;
+    border: none;
+    font-size: 16px;
+}
+
+.propertyType {
+    color: #00ce78
 }
