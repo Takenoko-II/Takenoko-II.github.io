@@ -1,18 +1,6 @@
-interface BlockProperty {
-    readonly name: string;
-    readonly type: string;
-    readonly values: { readonly value: string | number | boolean }[];
-}
+import { TextComponent } from "./TextComponent.js";
 
-interface DataItem {
-    readonly name: string;
-    readonly properties: { readonly name: string }[];
-}
-
-interface MojangBlocks {
-    readonly block_properties: BlockProperty[];
-    readonly data_items: DataItem[];
-}
+import { MojangBlocks, BlockProperty, DataItem } from "./data.js";
 
 class BlockStateSearchResultTable {
     private readonly table: HTMLTableElement = document.createElement("table");
@@ -26,37 +14,41 @@ class BlockStateSearchResultTable {
         stateCell.colSpan = 2 ** 31 - 1;
     }
 
+    private addPropertyCell(row: HTMLTableRowElement, property: BlockProperty) {
+        const cell: HTMLTableCellElement = row.insertCell(-1);
+
+        const name: HTMLButtonElement = document.createElement("button");
+        name.className = "propertyId";
+        name.textContent = property.name;
+
+        const c: HTMLSpanElement = document.createElement("span");
+        c.textContent = ": ";
+
+        const type: HTMLSpanElement = document.createElement("span");
+        type.className = "propertyType";
+        type.textContent = property.type;
+
+        cell.append(name, c, type);
+
+        name.addEventListener("click", () => {
+            type.textContent = property.values.map(({ value }) => value).toString();
+
+            if (property.type === "int" || property.type === "bool") {
+                type.style.color = "#b9ff98";
+            }
+            else {
+                type.style.color = "#e49764";
+            }
+        });
+    }
+
     public addBlock(id: string, properties: BlockProperty[]) {
         const row: HTMLTableRowElement = this.table.insertRow(-1);
 
         row.insertCell(-1).textContent = id;
 
         for (const property of properties) {
-            const cell: HTMLTableCellElement = row.insertCell(-1);
-
-            const name: HTMLButtonElement = document.createElement("button");
-            name.className = "propertyId";
-            name.textContent = property.name;
-
-            const c: HTMLSpanElement = document.createElement("span");
-            c.textContent = ": ";
-
-            const type: HTMLSpanElement = document.createElement("span");
-            type.className = "propertyType";
-            type.textContent = property.type;
-
-            cell.append(name, c, type);
-
-            name.addEventListener("click", () => {
-                type.textContent = property.values.map(({ value }) => value).toString();
-
-                if (property.type === "int" || property.type === "bool") {
-                    type.style.color = "#b9ff98";
-                }
-                else {
-                    type.style.color = "#e49764";
-                }
-            });
+            this.addPropertyCell(row, property);
         }
 
         return this;
@@ -94,7 +86,7 @@ function search(): void {
 
         const table: BlockStateSearchResultTable = new BlockStateSearchResultTable();
 
-        fetch("mojang-blocks.json").then(async response => {
+        fetch("../data/mojang-blocks.json").then(async response => {
             const data: MojangBlocks = await response.json();
 
             const map: Map<string, BlockProperty[]> = new Map();
@@ -103,9 +95,11 @@ function search(): void {
                 if (dataItem.properties.length === 0) continue;
 
                 if (tags.every(tag => dataItem.name.includes(tag) || dataItem.properties.some(_ => _.name.includes(tag)))) {
-                    const block: BlockProperty[] = dataItem.properties.map(({ name }) => {
+                    const block: BlockProperty[] = dataItem.properties
+                    .map(({ name }) => {
                         return data.block_properties.find(property => property.name === name);
-                    });
+                    })
+                    .filter(_ => _ !== undefined);
 
                     map.set(dataItem.name, block);
                 }
@@ -115,7 +109,7 @@ function search(): void {
                 table.addBlock(id, blockProperties);
             });
 
-            const oldTable: HTMLElement = document.getElementById("table");
+            const oldTable: HTMLElement | null = document.getElementById("table");
             if (oldTable !== null) {
                 oldTable.remove();
             }
@@ -138,6 +132,10 @@ function search(): void {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    document.getElementById("foo").addEventListener("click", search);
+    const foo = document.getElementById("foo");
+
+    if (foo === null) return;
+    
+    foo.addEventListener("click", search);
     search();
 });
