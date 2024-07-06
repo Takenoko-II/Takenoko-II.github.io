@@ -139,6 +139,5 @@ function search(): void {
 
 document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("foo").addEventListener("click", search);
-
     search();
 });
