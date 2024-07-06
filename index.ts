@@ -37,18 +37,26 @@ class BlockStateSearchResultTable {
             const name: HTMLButtonElement = document.createElement("button");
             name.className = "propertyId";
             name.textContent = property.name;
-            name.addEventListener("click", () => {
-                console.log("Hello World!");
-            });
 
             const c: HTMLSpanElement = document.createElement("span");
             c.textContent = ": ";
 
             const type: HTMLSpanElement = document.createElement("span");
-            type.className = "propertyType"
+            type.className = "propertyType";
             type.textContent = property.type;
 
             cell.append(name, c, type);
+
+            name.addEventListener("click", () => {
+                type.textContent = property.values.map(({ value }) => value).toString();
+
+                if (property.type === "int" || property.type === "bool") {
+                    type.style.color = "#b9ff98";
+                }
+                else {
+                    type.style.color = "#e49764";
+                }
+            });
         }
 
         return this;
@@ -57,60 +65,90 @@ class BlockStateSearchResultTable {
     public get(): HTMLTableElement {
         return this.table;
     }
+
+    public isEmpty(): boolean {
+        return this.table.rows.length === 1;
+    }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+const loading: HTMLElement = document.createElement("p");
+loading.textContent = "LOADING...";
+loading.style.fontSize = "64px";
+loading.style.color = "white";
+loading.id = "LOADING";
+
+const noHit: HTMLElement = document.createElement("p");
+noHit.textContent = "何も見つかりませんでした；；";
+noHit.style.fontSize = "64px";
+noHit.style.color = "white";
+ noHit.id = "NOHIT";
+
+function search(): void {
     const foo = document.getElementById("foo");
 
     if (foo === null) return;
 
-    foo.addEventListener("click", () => {
-        const input = document.getElementById("input");
-        if (input instanceof HTMLInputElement) {
-            const tags = input.value.split(/\s+/g);
+    const input = document.getElementById("input");
+    if (input instanceof HTMLInputElement) {
+        const tags = input.value.split(/\s+/g);
 
-            const table: BlockStateSearchResultTable = new BlockStateSearchResultTable();
+        const table: BlockStateSearchResultTable = new BlockStateSearchResultTable();
 
-            fetch("mojang-blocks.json").then(async response => {
-                const data: MojangBlocks = await response.json();
+        fetch("mojang-blocks.json").then(async response => {
+            const data: MojangBlocks = await response.json();
 
-                for (const dataItem of data.data_items) {
-                    if (dataItem.properties.length === 0) continue;
+            const map: Map<string, BlockProperty[]> = new Map();
 
-                    if (tags.some(tag => dataItem.name.includes(tag))) {
-                        const block: BlockProperty[] = dataItem.properties.map(({ name }) => {
-                            return data.block_properties.find(property => property.name === name);
-                        });
+            for (const dataItem of data.data_items) {
+                if (dataItem.properties.length === 0) continue;
 
-                        table.addBlock(dataItem.name, block);
+                if (tags.some(tag => dataItem.name.includes(tag))) {
+                    const block: BlockProperty[] = dataItem.properties.map(({ name }) => {
+                        return data.block_properties.find(property => property.name === name);
+                    });
+
+                    map.set(dataItem.name, block);
+                }
+            }
+
+            for (const blockProperty of data.block_properties) {
+                if (tags.some(tag => blockProperty.name.includes(tag) || blockProperty.type === tag)) {
+                    for (const dataItem of data.data_items) {
+                        if (dataItem.properties.some(property => property.name !== blockProperty.name)) continue;
+
+                        map.set(dataItem.name, [blockProperty]);
                     }
                 }
+            }
 
-                const oldTable: HTMLElement = document.getElementById("table");
-                if (oldTable !== null) {
-                    oldTable.remove();
-                }
-
-                const oldBigP: HTMLElement = document.getElementById("LOADING");
-                if (oldBigP !== null) {
-                    oldBigP.remove();
-                }
-
-                const bigP: HTMLElement = document.createElement("p");
-                bigP.textContent = "LOADING...";
-                bigP.style.fontSize = "64px";
-                bigP.style.color = "white";
-                bigP.id = "LOADING";
-
-                foo.after(bigP);
-
-                setTimeout(() => {
-                    foo.after(table.get());
-                    bigP.remove();
-                }, 300);
+            map.forEach((blockProperties, id) => {
+                table.addBlock(id, blockProperties);
             });
-        }
-    });
 
-    foo.click();
+            const oldTable: HTMLElement = document.getElementById("table");
+            if (oldTable !== null) {
+                oldTable.remove();
+            }
+
+            foo.after(loading);
+            noHit.remove();
+
+            setTimeout(() => {
+                loading.remove();
+
+                if (table.isEmpty()) {
+                    foo.after(noHit);
+                }
+                else {
+                    foo.after(table.get());
+                }
+            }, 300);
+        });
+    }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("foo").addEventListener("click", search);
+
+    search();
 });

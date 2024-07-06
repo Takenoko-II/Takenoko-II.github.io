@@ -34,7 +34,6 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var _this = this;
 var BlockStateSearchResultTable = /** @class */ (function () {
     function BlockStateSearchResultTable() {
         this.table = document.createElement("table");
@@ -48,83 +47,125 @@ var BlockStateSearchResultTable = /** @class */ (function () {
     BlockStateSearchResultTable.prototype.addBlock = function (id, properties) {
         var row = this.table.insertRow(-1);
         row.insertCell(-1).textContent = id;
-        for (var _i = 0, properties_1 = properties; _i < properties_1.length; _i++) {
-            var property = properties_1[_i];
+        var _loop_1 = function (property) {
             var cell = row.insertCell(-1);
             var name_1 = document.createElement("button");
             name_1.className = "propertyId";
             name_1.textContent = property.name;
-            name_1.addEventListener("click", function () {
-                console.log("Hello World!");
-            });
             var c = document.createElement("span");
             c.textContent = ": ";
             var type = document.createElement("span");
             type.className = "propertyType";
             type.textContent = property.type;
             cell.append(name_1, c, type);
+            name_1.addEventListener("click", function () {
+                type.textContent = property.values.map(function (_a) {
+                    var value = _a.value;
+                    return value;
+                }).toString();
+                if (property.type === "int" || property.type === "bool") {
+                    type.style.color = "#b9ff98";
+                }
+                else {
+                    type.style.color = "#e49764";
+                }
+            });
+        };
+        for (var _i = 0, properties_1 = properties; _i < properties_1.length; _i++) {
+            var property = properties_1[_i];
+            _loop_1(property);
         }
         return this;
     };
     BlockStateSearchResultTable.prototype.get = function () {
         return this.table;
     };
+    BlockStateSearchResultTable.prototype.isEmpty = function () {
+        return this.table.rows.length === 1;
+    };
     return BlockStateSearchResultTable;
 }());
-document.addEventListener("DOMContentLoaded", function () {
+var loading = document.createElement("p");
+loading.textContent = "LOADING...";
+loading.style.fontSize = "64px";
+loading.style.color = "white";
+loading.id = "LOADING";
+var noHit = document.createElement("p");
+noHit.textContent = "何も見つかりませんでした；；";
+noHit.style.fontSize = "64px";
+noHit.style.color = "white";
+noHit.id = "NOHIT";
+function search() {
+    var _this = this;
     var foo = document.getElementById("foo");
     if (foo === null)
         return;
-    foo.addEventListener("click", function () {
-        var input = document.getElementById("input");
-        if (input instanceof HTMLInputElement) {
-            var tags_1 = input.value.split(/\s+/g);
-            var table_1 = new BlockStateSearchResultTable();
-            fetch("mojang-blocks.json").then(function (response) { return __awaiter(_this, void 0, void 0, function () {
-                var data, _loop_1, _i, _a, dataItem, oldTable, oldBigP, bigP;
-                return __generator(this, function (_b) {
-                    switch (_b.label) {
-                        case 0: return [4 /*yield*/, response.json()];
-                        case 1:
-                            data = _b.sent();
-                            _loop_1 = function (dataItem) {
-                                if (dataItem.properties.length === 0)
-                                    return "continue";
-                                if (tags_1.some(function (tag) { return dataItem.name.includes(tag); })) {
-                                    var block = dataItem.properties.map(function (_a) {
-                                        var name = _a.name;
-                                        return data.block_properties.find(function (property) { return property.name === name; });
-                                    });
-                                    table_1.addBlock(dataItem.name, block);
+    var input = document.getElementById("input");
+    if (input instanceof HTMLInputElement) {
+        var tags_1 = input.value.split(/\s+/g);
+        var table_1 = new BlockStateSearchResultTable();
+        fetch("mojang-blocks.json").then(function (response) { return __awaiter(_this, void 0, void 0, function () {
+            var data, map, _loop_2, _i, _a, dataItem, _loop_3, _b, _c, blockProperty, oldTable;
+            return __generator(this, function (_d) {
+                switch (_d.label) {
+                    case 0: return [4 /*yield*/, response.json()];
+                    case 1:
+                        data = _d.sent();
+                        map = new Map();
+                        _loop_2 = function (dataItem) {
+                            if (dataItem.properties.length === 0)
+                                return "continue";
+                            if (tags_1.some(function (tag) { return dataItem.name.includes(tag); })) {
+                                var block = dataItem.properties.map(function (_a) {
+                                    var name = _a.name;
+                                    return data.block_properties.find(function (property) { return property.name === name; });
+                                });
+                                map.set(dataItem.name, block);
+                            }
+                        };
+                        for (_i = 0, _a = data.data_items; _i < _a.length; _i++) {
+                            dataItem = _a[_i];
+                            _loop_2(dataItem);
+                        }
+                        _loop_3 = function (blockProperty) {
+                            if (tags_1.some(function (tag) { return blockProperty.name.includes(tag) || blockProperty.type === tag; })) {
+                                for (var _e = 0, _f = data.data_items; _e < _f.length; _e++) {
+                                    var dataItem = _f[_e];
+                                    if (dataItem.properties.some(function (property) { return property.name !== blockProperty.name; }))
+                                        continue;
+                                    map.set(dataItem.name, [blockProperty]);
                                 }
-                            };
-                            for (_i = 0, _a = data.data_items; _i < _a.length; _i++) {
-                                dataItem = _a[_i];
-                                _loop_1(dataItem);
                             }
-                            oldTable = document.getElementById("table");
-                            if (oldTable !== null) {
-                                oldTable.remove();
+                        };
+                        for (_b = 0, _c = data.block_properties; _b < _c.length; _b++) {
+                            blockProperty = _c[_b];
+                            _loop_3(blockProperty);
+                        }
+                        map.forEach(function (blockProperties, id) {
+                            table_1.addBlock(id, blockProperties);
+                        });
+                        oldTable = document.getElementById("table");
+                        if (oldTable !== null) {
+                            oldTable.remove();
+                        }
+                        foo.after(loading);
+                        noHit.remove();
+                        setTimeout(function () {
+                            loading.remove();
+                            if (table_1.isEmpty()) {
+                                foo.after(noHit);
                             }
-                            oldBigP = document.getElementById("LOADING");
-                            if (oldBigP !== null) {
-                                oldBigP.remove();
-                            }
-                            bigP = document.createElement("p");
-                            bigP.textContent = "LOADING...";
-                            bigP.style.fontSize = "64px";
-                            bigP.style.color = "white";
-                            bigP.id = "LOADING";
-                            foo.after(bigP);
-                            setTimeout(function () {
+                            else {
                                 foo.after(table_1.get());
-                                bigP.remove();
-                            }, 300);
-                            return [2 /*return*/];
-                    }
-                });
-            }); });
-        }
-    });
-    foo.click();
+                            }
+                        }, 300);
+                        return [2 /*return*/];
+                }
+            });
+        }); });
+    }
+}
+document.addEventListener("DOMContentLoaded", function () {
+    document.getElementById("foo").addEventListener("click", search);
+    search();
 });

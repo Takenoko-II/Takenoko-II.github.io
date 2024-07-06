@@ -16,7 +16,13 @@ p, h1, h2, h3, h4, h5, h6 {
     border-radius: 12px;
     border: none;
     color: white;
-    font-size: large;
+    font-size: 32px;
+    box-shadow: 0 8px 0 #711974
+}
+
+.search:hover {
+    background: linear-gradient(to bottom, #6271e7, #de60e2);
+    box-shadow: 0 8px 0 #713474
 }
 
 input[type="text"] {
@@ -26,9 +32,9 @@ input[type="text"] {
     background-color: black;
     color: white;
     border-radius: 5px;
-    font-size: 24px;
+    font-size: 30px;
     border-width: 4px;
-    border-color:aquamarine;
+    border-color:#eed462
 }
 
 img {
@@ -41,11 +47,22 @@ table, table th, table td {
     border: 2px solid white;
 }
 
+table {
+    position: relative;
+    top: 32px;
+}
+
 .propertyId {
     color: #fff6a3;
     background: #333333;
     border: none;
     font-size: 16px;
+    text-decoration: underline white;
+}
+
+.propertyId:hover {
+    color: white;
+    text-decoration: underline rgb(0, 225, 255);
 }
 
 .propertyType {
